@@ -18,6 +18,7 @@ Homepage = "https://github.com/simonlin1212/tradingagents-astock"
 Repository = "https://github.com/simonlin1212/tradingagents-astock"
 Issues = "https://github.com/simonlin1212/tradingagents-astock/issues"
 Upstream = "https://github.com/TauricResearch/TradingAgents"
+
 dependencies = [
     "langchain-core>=0.3.81",
     "backtrader>=1.9.78.123",
