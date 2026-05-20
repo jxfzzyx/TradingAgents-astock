@@ -134,6 +134,8 @@ class _ReportPDF(FPDF):
             "不构成任何投资建议。投资决策请咨询持牌专业机构。"
             "使用本报告所产生的任何损失由使用者自行承担。",
             align="C",
+            new_x="LMARGIN",
+            new_y="NEXT",
         )
 
     def add_section(self, title: str, content: str) -> None:
@@ -204,11 +206,11 @@ class _ReportPDF(FPDF):
                     bullet = f"  {m.group(1)} "
                     body = m.group(2)
                 body = _strip_md_inline(body)
-                self.multi_cell(0, 5.5, bullet + body)
+                self.multi_cell(0, 5.5, bullet + body, new_x="LMARGIN", new_y="NEXT")
                 i += 1
                 continue
 
-            # Table rows (|col|col|) → render as plain text with spacing
+            # Table rows (|col|col|) → render each cell on its own line
             if stripped.startswith("|") and stripped.endswith("|"):
                 # Skip separator rows like |---|---|
                 if re.match(r"^\|[-:\s|]+\|$", stripped):
@@ -217,8 +219,9 @@ class _ReportPDF(FPDF):
                 self._use_font("", 9)
                 self.set_text_color(60, 60, 60)
                 cells = [c.strip() for c in stripped.strip("|").split("|")]
-                row_text = "    ".join(_strip_md_inline(c) for c in cells)
-                self.multi_cell(0, 5, row_text)
+                # Render cells on separate lines to avoid horizontal overflow
+                row_text = "\n".join(_strip_md_inline(c) for c in cells)
+                self.multi_cell(0, 5, row_text, new_x="LMARGIN", new_y="NEXT")
                 i += 1
                 continue
 
@@ -236,7 +239,7 @@ class _ReportPDF(FPDF):
                 self.set_text_color(40, 40, 40)
                 para = " ".join(para_lines)
                 para = _strip_md_inline(para)
-                self.multi_cell(0, 5.5, para)
+                self.multi_cell(0, 5.5, para, new_x="LMARGIN", new_y="NEXT")
                 self.ln(2)
                 continue
 
