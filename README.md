@@ -266,16 +266,60 @@ streamlit run web/app.py
 
 ---
 
+## Docker 部署
+
+### 快速开始
+
+```bash
+# 1. 准备 .env 文件
+cp .env.example .env
+# 修改 .env 中的 LLM API Key
+
+# 2. CLI 模式
+docker compose up tradingagents
+docker compose exec tradingagents tradingagents
+
+# 3. Web UI 模式（推荐）
+docker compose up web
+# 访问 http://localhost:8501
+```
+
+### 模式说明
+
+| 模式 | 命令 | 说明 |
+|------|------|------|
+| CLI | `docker compose up tradingagents` | 交互式命令行分析 |
+| Web UI | `docker compose up web` | Streamlit 可视化界面（8501 端口） |
+| + One-API | `docker compose --profile proxy up` | 自带中转站（One-API + MySQL，3000 端口） |
+| + Ollama | `docker compose --profile ollama up` | 本地 Ollama 模型 |
+
+### 第三方中转站配置
+
+如果你已有 One-API / New-API 等中转站运行在宿主机 `localhost:3000`：
+
+```bash
+# .env 中添加
+LLM_PROVIDER=proxy
+PROXY_API_KEY=sk-your-proxy-key
+BACKEND_URL=http://host.docker.internal:3000/v1
+
+docker compose up web
+```
+
+> **注意**：macOS/Windows 使用 `host.docker.internal` 访问宿主机服务；Linux Docker 改为 `172.17.0.1`。
+
+---
+
 ## 配置说明
 
 所有配置通过 `config` 字典传入，完整选项：
 
 | 参数 | 默认值 | 说明 |
 |------|--------|------|
-| `llm_provider` | `"minimax"` | LLM 提供商：`minimax` / `deepseek` / `qwen` / `glm` / `openai` / `anthropic` / `google` / `xai` / `ollama` |
+| `llm_provider` | `"minimax"` | LLM 提供商：`minimax` / `deepseek` / `qwen` / `glm` / `openai` / `anthropic` / `google` / `xai` / `ollama` / `proxy` |
 | `deep_think_llm` | `"MiniMax-M2.7"` | Research Manager + Portfolio Manager 用的模型 |
 | `quick_think_llm` | `"MiniMax-M2.7-highspeed"` | 所有 Analyst / Researcher / Trader 用的模型 |
-| `backend_url` | `None` | 自定义 API 端点（Kimi、deepseek 等兼容 API） |
+| `backend_url` | `None` | 自定义 API 端点（Kimi、deepseek、第三方中转站等兼容 API） |
 | `output_language` | `"Chinese"` | 报告输出语言（内部辩论始终英文） |
 | `max_debate_rounds` | `1` | Bull vs Bear 辩论轮数 |
 | `max_risk_discuss_rounds` | `1` | 风险三方辩论轮数 |

@@ -10,7 +10,8 @@ WORKDIR /build
 COPY . .
 RUN pip install --no-cache-dir .
 
-FROM python:3.12-slim
+# ── CLI image ────────────────────────────────────────────────────────────────
+FROM python:3.12-slim AS cli
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
@@ -25,3 +26,14 @@ WORKDIR /home/appuser/app
 COPY --from=builder --chown=appuser:appuser /build .
 
 ENTRYPOINT ["tradingagents"]
+
+# ── Web UI image ─────────────────────────────────────────────────────────────
+FROM cli AS web
+
+EXPOSE 8501
+
+ENV STREAMLIT_SERVER_PORT=8501 \
+    STREAMLIT_SERVER_ADDRESS=0.0.0.0 \
+    STREAMLIT_SERVER_HEADLESS=true
+
+ENTRYPOINT ["tradingagents-web"]

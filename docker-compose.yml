@@ -1,12 +1,66 @@
 services:
   tradingagents:
-    build: .
+    build:
+      context: .
+      target: cli
     env_file:
       - .env
     volumes:
       - tradingagents_data:/home/appuser/.tradingagents
     tty: true
     stdin_open: true
+
+  web:
+    build:
+      context: .
+      target: web
+    env_file:
+      - .env
+    ports:
+      - "8501:8501"
+    volumes:
+      - tradingagents_data:/home/appuser/.tradingagents
+
+  proxy:
+    image: songquanpeng/one-api:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - oneapi_data:/data
+    environment:
+      - SQL_DSN=root:password@tcp(mysql:3306)/one-api
+    profiles:
+      - proxy
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: one-api
+    volumes:
+      - mysql_data:/var/lib/mysql
+    profiles:
+      - proxy
+
+  tradingagents-proxy:
+    build:
+      context: .
+      target: web
+    env_file:
+      - .env
+    environment:
+      - LLM_PROVIDER=proxy
+      - BACKEND_URL=http://host.docker.internal:3000/v1
+    ports:
+      - "8502:8501"
+    volumes:
+      - tradingagents_data:/home/appuser/.tradingagents
+    depends_on:
+      - proxy
+    profiles:
+      - proxy
 
   ollama:
     image: ollama/ollama:latest
@@ -16,20 +70,25 @@ services:
       - ollama
 
   tradingagents-ollama:
-    build: .
+    build:
+      context: .
+      target: web
     env_file:
       - .env
     environment:
       - LLM_PROVIDER=ollama
+      - BACKEND_URL=http://ollama:11434/v1
+    ports:
+      - "8503:8501"
     volumes:
       - tradingagents_data:/home/appuser/.tradingagents
     depends_on:
       - ollama
-    tty: true
-    stdin_open: true
     profiles:
       - ollama
 
 volumes:
   tradingagents_data:
   ollama_data:
+  oneapi_data:
+  mysql_data:
