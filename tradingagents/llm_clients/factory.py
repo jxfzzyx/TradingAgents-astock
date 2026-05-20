@@ -5,6 +5,7 @@ from .base_client import BaseLLMClient
 # Providers that use the OpenAI-compatible chat completions API
 _OPENAI_COMPATIBLE = (
     "openai", "xai", "deepseek", "qwen", "glm", "ollama", "openrouter", "minimax",
+    "proxy",  # 第三方中转站（OpenAI Chat Completions 兼容）
 )
 
 

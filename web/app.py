@@ -146,6 +146,10 @@ def _build_config() -> dict:
     config["max_debate_rounds"] = 1
     config["max_risk_discuss_rounds"] = 1
     config["output_language"] = "Chinese"
+    # 第三方中转站 API 地址
+    backend_url = st.session_state.get("backend_url")
+    if backend_url:
+        config["backend_url"] = backend_url
     return config
 
 

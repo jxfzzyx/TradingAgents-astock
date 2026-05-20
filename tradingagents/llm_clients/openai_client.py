@@ -118,6 +118,7 @@ _PROVIDER_CONFIG = {
     "openrouter": ("https://openrouter.ai/api/v1", "OPENROUTER_API_KEY"),
     "ollama": ("http://localhost:11434/v1", None),
     "minimax": ("https://api.minimax.chat/v1", "MINIMAX_API_KEY"),
+    "proxy": (None, "PROXY_API_KEY"),  # 第三方中转站，无默认 URL，需用户指定 backend_url
 }
 
 
@@ -150,7 +151,13 @@ class OpenAIClient(BaseLLMClient):
         # provider default so users can route through their own gateway.
         if self.provider in _PROVIDER_CONFIG:
             default_base, api_key_env = _PROVIDER_CONFIG[self.provider]
-            llm_kwargs["base_url"] = self.base_url or default_base
+            resolved_base = self.base_url or default_base
+            if self.provider == "proxy" and not resolved_base:
+                raise ValueError(
+                    "第三方中转站必须指定 base_url（即中转站的 API 地址，如 http://localhost:3000/v1）。"
+                    "代码方式：config['backend_url'] = '...'; Web UI：侧边栏模型配置中输入中转站地址。"
+                )
+            llm_kwargs["base_url"] = resolved_base
             if api_key_env:
                 api_key = os.environ.get(api_key_env)
                 if api_key:

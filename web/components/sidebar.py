@@ -11,6 +11,7 @@ from web.history import get_history
 
 # Provider display names in recommended order
 _PROVIDERS: list[tuple[str, str]] = [
+    ("第三方中转站", "proxy"),
     ("MiniMax（推荐·国内直连）", "minimax"),
     ("DeepSeek", "deepseek"),
     ("通义千问 Qwen", "qwen"),
@@ -53,6 +54,16 @@ def _render_llm_config() -> None:
     )
     provider_key = _PROVIDER_KEYS[provider_idx]
     st.session_state["llm_provider"] = provider_key
+
+    # 第三方中转站需额外指定 API 地址
+    if provider_key == "proxy":
+        st.text_input(
+            "中转站 API 地址",
+            key="proxy_backend_url",
+            placeholder="例: http://localhost:3000/v1",
+            help="中转站的 OpenAI 兼容 API 地址（以 /v1 结尾）",
+        )
+        st.session_state["backend_url"] = st.session_state.get("proxy_backend_url", "").strip() or None
 
     if provider_key in MODEL_OPTIONS:
         quick_options = MODEL_OPTIONS[provider_key]["quick"]
