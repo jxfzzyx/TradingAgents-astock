@@ -74,6 +74,22 @@ def _render_llm_config() -> None:
         deep_labels = [label for label, _ in deep_options]
         deep_values = [value for _, value in deep_options]
 
+        # 第三方中转站用文本输入框自定义模型名
+        if provider_key == "proxy":
+            st.session_state["quick_think_llm"] = st.text_input(
+                "快速思考模型",
+                key="quick_model_text",
+                placeholder="例: gpt-4o, claude-sonnet-4-6, qwen-plus",
+                help="中转站注册的模型名称",
+            )
+            st.session_state["deep_think_llm"] = st.text_input(
+                "深度思考模型",
+                key="deep_model_text",
+                placeholder="例: gpt-5, claude-opus-4-6, qwen3.6-plus",
+                help="中转站注册的模型名称",
+            )
+            return
+
         quick_idx = st.selectbox(
             "快速思考模型",
             range(len(quick_options)),
