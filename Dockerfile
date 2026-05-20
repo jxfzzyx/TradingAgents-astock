@@ -25,6 +25,11 @@ WORKDIR /home/appuser/app
 
 COPY --from=builder --chown=appuser:appuser /build .
 
+# Install CJK fonts for PDF generation (wqy-microhei provides TTF, better for fpdf2)
+USER root
+RUN apt-get update && apt-get install -y --no-install-recommends fonts-wqy-microhei && rm -rf /var/lib/apt/lists/*
+USER appuser
+
 ENTRYPOINT ["tradingagents"]
 
 # ── Web UI image ─────────────────────────────────────────────────────────────

@@ -11,10 +11,15 @@ from fpdf import FPDF
 
 
 _FONT_CANDIDATES = [
+    # Windows
+    "C:/Windows/Fonts/simhei.ttf",        # 黑体
+    "C:/Windows/Fonts/msyh.ttc",          # 微软雅黑
+    "C:/Windows/Fonts/simsun.ttc",        # 宋体
+    # macOS
     "/System/Library/Fonts/PingFang.ttc",
     "/System/Library/Fonts/STHeiti Light.ttc",
-    "/usr/share/fonts/truetype/noto/NotoSansSC-Regular.ttf",
-    "/usr/share/fonts/noto-cjk/NotoSansCJKsc-Regular.otf",
+    # Linux (TTF format, best for fpdf2)
+    "/usr/share/fonts/truetype/wqy/wqy-microhei.ttc",
     "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
 ]
 
