@@ -134,8 +134,10 @@ st.markdown(
 def _build_config() -> dict:
     config = DEFAULT_CONFIG.copy()
     config["llm_provider"] = st.session_state.get("llm_provider", "minimax")
-    quick_model = st.session_state.get("quick_think_llm", "").strip() or "MiniMax-M2.7-highspeed"
-    deep_model = st.session_state.get("deep_think_llm", "").strip() or "MiniMax-M2.7"
+    # Read model names from widget keys directly — works regardless of
+    # expander collapse state (Streamlit persists widget values across rerenders)
+    quick_model = st.session_state.get("quick_model_text", "").strip() or "MiniMax-M2.7-highspeed"
+    deep_model = st.session_state.get("deep_model_text", "").strip() or "MiniMax-M2.7"
     config["deep_think_llm"] = deep_model
     config["quick_think_llm"] = quick_model
     config["data_vendors"] = {
