@@ -134,8 +134,10 @@ st.markdown(
 def _build_config() -> dict:
     config = DEFAULT_CONFIG.copy()
     config["llm_provider"] = st.session_state.get("llm_provider", "minimax")
-    config["deep_think_llm"] = st.session_state.get("deep_think_llm", "MiniMax-M2.7")
-    config["quick_think_llm"] = st.session_state.get("quick_think_llm", "MiniMax-M2.7-highspeed")
+    quick_model = st.session_state.get("quick_think_llm", "").strip() or "MiniMax-M2.7-highspeed"
+    deep_model = st.session_state.get("deep_think_llm", "").strip() or "MiniMax-M2.7"
+    config["deep_think_llm"] = deep_model
+    config["quick_think_llm"] = quick_model
     config["data_vendors"] = {
         "core_stock_apis": "a_stock",
         "technical_indicators": "a_stock",
