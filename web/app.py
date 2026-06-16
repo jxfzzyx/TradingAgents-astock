@@ -134,8 +134,17 @@ st.markdown(
 def _build_config() -> dict:
     config = DEFAULT_CONFIG.copy()
     config["llm_provider"] = st.session_state.get("llm_provider", "minimax")
-    config["deep_think_llm"] = st.session_state.get("deep_think_llm", "MiniMax-M2.7")
-    config["quick_think_llm"] = st.session_state.get("quick_think_llm", "MiniMax-M2.7-highspeed")
+    # Read model names from widget keys directly
+    quick_model = st.session_state.get("quick_model_text", "").strip()
+    deep_model = st.session_state.get("deep_model_text", "").strip()
+    # If deep model not set, use quick model as fallback (avoids MiniMax default
+    # being sent to non-MiniMax backends like DashScope/OpenRouter)
+    if not deep_model:
+        deep_model = quick_model or "MiniMax-M2.7"
+    if not quick_model:
+        quick_model = "MiniMax-M2.7-highspeed"
+    config["deep_think_llm"] = deep_model
+    config["quick_think_llm"] = quick_model
     config["data_vendors"] = {
         "core_stock_apis": "a_stock",
         "technical_indicators": "a_stock",
@@ -146,6 +155,10 @@ def _build_config() -> dict:
     config["max_debate_rounds"] = 1
     config["max_risk_discuss_rounds"] = 1
     config["output_language"] = "Chinese"
+    # 第三方中转站 API 地址
+    backend_url = st.session_state.get("backend_url")
+    if backend_url:
+        config["backend_url"] = backend_url
     return config
 
 

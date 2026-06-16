@@ -11,6 +11,7 @@ from web.history import get_history
 
 # Provider display names in recommended order
 _PROVIDERS: list[tuple[str, str]] = [
+    ("第三方中转站", "proxy"),
     ("MiniMax（推荐·国内直连）", "minimax"),
     ("DeepSeek", "deepseek"),
     ("通义千问 Qwen", "qwen"),
@@ -54,6 +55,16 @@ def _render_llm_config() -> None:
     provider_key = _PROVIDER_KEYS[provider_idx]
     st.session_state["llm_provider"] = provider_key
 
+    # 第三方中转站需额外指定 API 地址
+    if provider_key == "proxy":
+        st.text_input(
+            "中转站 API 地址",
+            key="proxy_backend_url",
+            placeholder="例: http://localhost:3000/v1",
+            help="中转站的 OpenAI 兼容 API 地址（以 /v1 结尾）",
+        )
+        st.session_state["backend_url"] = st.session_state.get("proxy_backend_url", "").strip() or None
+
     if provider_key in MODEL_OPTIONS:
         quick_options = MODEL_OPTIONS[provider_key]["quick"]
         deep_options = MODEL_OPTIONS[provider_key]["deep"]
@@ -62,6 +73,25 @@ def _render_llm_config() -> None:
         quick_values = [value for _, value in quick_options]
         deep_labels = [label for label, _ in deep_options]
         deep_values = [value for _, value in deep_options]
+
+        # 第三方中转站用文本输入框自定义模型名
+        if provider_key == "proxy":
+            st.text_input(
+                "快速思考模型",
+                key="quick_model_text",
+                placeholder="例: gpt-4o, claude-sonnet-4-6, qwen-plus",
+                help="中转站注册的模型名称",
+            )
+            st.text_input(
+                "深度思考模型",
+                key="deep_model_text",
+                placeholder="例: gpt-5, claude-opus-4-6, qwen3.6-plus",
+                help="中转站注册的模型名称",
+            )
+            # 始终同步到配置 key，不受 expander 折叠影响
+            st.session_state["quick_think_llm"] = st.session_state.get("quick_model_text", "").strip()
+            st.session_state["deep_think_llm"] = st.session_state.get("deep_model_text", "").strip()
+            return
 
         quick_idx = st.selectbox(
             "快速思考模型",

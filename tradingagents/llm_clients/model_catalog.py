@@ -127,6 +127,10 @@ MODEL_OPTIONS: ProviderModeOptions = {
             ("Qwen3:latest (8B, local)", "qwen3:latest"),
         ],
     },
+    "proxy": {
+        "quick": [("自定义模型 ID（中转站注册的模型名）", "custom")],
+        "deep": [("自定义模型 ID（中转站注册的模型名）", "custom")],
+    },
 }
 
 
